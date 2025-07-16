@@ -8,24 +8,15 @@ import matplotlib.dates as mdates
 st.set_page_config(layout="wide")
 st.title("Flight Ground Time Visualizer (RON-Aware + Dropdown Edition)")
 
-# --- Load from Downloads ---
-downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
-excel_files = sorted(
-    [f for f in os.listdir(downloads_folder) if f.endswith(".xlsx")],
-    key=lambda x: os.path.getmtime(os.path.join(downloads_folder, x)),
-    reverse=True
-)
+# --- File Uploader ---
+uploaded_file = st.file_uploader("Upload a flight schedule Excel file", type=["xlsx"])
 
-if not excel_files:
-    st.error("No Excel (.xlsx) files found in your Downloads folder.")
+if not uploaded_file:
+    st.warning("Please upload an Excel (.xlsx) file to continue.")
     st.stop()
 
-selected_file = st.selectbox("Select a flight schedule Excel file from Downloads:", excel_files)
-file_path = os.path.join(downloads_folder, selected_file)
-
 # --- Load data ---
-df = pd.read_excel(file_path)
-df.columns = df.columns.str.strip()  # Strip whitespace from headers
+df = pd.read_excel(uploaded_file)
 
 # --- Parse datetime columns ---
 df['ARRIVE_DATE_TIME_LOCAL'] = pd.to_datetime(df['ARRIVE_DATE_TIME_LOCAL'], errors='coerce')
